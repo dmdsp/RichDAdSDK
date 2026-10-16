@@ -1,0 +1,74 @@
+//
+//  RichDAds.h
+//  RichDAdSDK
+//
+//  Created by 刘士林 on 2024/3/19.
+//
+
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "RichDPrivacyConfig.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSInteger, RichDAdBiddingCode) {
+    RichDAdBiddingCodeUnknown = 1001, // 未知
+    RichDAdBiddingCodeNoValidAd = 1002, // 无有效广告
+    RichDAdBiddingCodeNoValidParam = 1003, // 无有效参数（缺少必填字段）
+    RichDAdBiddingCodeNoValidSpec = 1004, // 无有效规格
+    RichDAdBiddingCodeTimeout = 1005, // 超时
+    RichDAdBiddingCodeExceptionResponse = 1006, // 异常响应
+    RichDAdBiddingCodeFloorPriceOvershoot = 2001, // 底价过高
+    RichDAdBiddingCodeLowMassFlow = 2002, // 低质量流量
+    RichDAdBiddingCodeHitCounterCheat = 2003, // 命中反作弊
+    RichDAdBiddingCodeBuyThroughOtherChannel = 2004 // 已通过其他渠道采买
+};
+typedef NS_ENUM(NSInteger, RichDAdCreativeType) {
+    RichDAdCreativeTypeUnknown = 0, // 未知类型
+    RichDAdCreativeTypeImage = 1,   // 图片广告
+    RichDAdCreativeTypeVideo = 2    // 视频广告
+};
+typedef NS_ENUM(NSInteger, AdTemplateId) {
+    AdTemplateIdSplash = 60002, // 开屏
+    AdTemplateIdFeed = 20005, // 信息流
+    AdTemplateIdBanner = 40001, // Banner
+    AdTemplateIdInterstitial = 50001, // 插屏
+    AdTemplateIdRewardVideoLand = 70001, // 激励视频-横屏
+    AdTemplateIdRewardVideoPort = 10002 // 激励视频-竖屏
+};
+typedef NS_ENUM(NSInteger, RichDAdCloseType) {
+    RichDAdCloseTypeSkipButton,   // 点击跳过关闭
+    RichDAdCloseTypeDetailButton,  // 点击详情之后关闭
+    RichDAdCloseTypeAutoClose      // 自动关闭
+};
+typedef void(^CompletionEvent)(BOOL success);
+@class RichDUnionModel;
+@class RichDUnionTrackerModel;
+
+@interface RichDAds : NSObject
+@property(nonatomic,strong) RichDUnionModel *ksModel, *gmModel, *iqModel, *configModel;
+
+// 单例
++(instancetype)shareInstance;
+/// 隐私配置，需在 initSDK 前调用
+- (void)setPrivacyConfig:(RichDPrivacyConfig *)config;
+//SDK 初始化
+-(void)initSDK;
+/// 优化版初始化，冷启动广告展示速度更快，建议在适配器集成完善后使用。
+-(void)initSDKOptimized;
+//聚合初始化
+-(void)initUnionSDKCompletion:(CompletionEvent) completion;
+//获取SDK版本号
+-(NSString*)getSdkVersion;
+//设备信息
+-(NSString*)getSdkDevice;
+//
+-(NSString*)getUnionSdkTracker:(RichDUnionTrackerModel *)unionTrackerModel templateId:(AdTemplateId)templateId;
+/// 根据我方 slotID 获取 GroMore 竞价场景下的 ECPM 价格（单位：分），来源为服务端配置的 expandData 字段
+- (long)getGromoreECPMForSlotID:(NSString *)slotID;
+/// 切换到本地测试环境，所有请求指向 10.0.0.203:8181
+- (void)switchToTestEnvironment;
+
+@end
+
+NS_ASSUME_NONNULL_END

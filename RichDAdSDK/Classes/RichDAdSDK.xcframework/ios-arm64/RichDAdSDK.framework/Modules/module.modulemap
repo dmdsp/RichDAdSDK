@@ -1,0 +1,6 @@
+framework module RichDAdSDK {
+  umbrella header "RichDAdSDK.h"
+  export *
+
+  module * { export * }
+}

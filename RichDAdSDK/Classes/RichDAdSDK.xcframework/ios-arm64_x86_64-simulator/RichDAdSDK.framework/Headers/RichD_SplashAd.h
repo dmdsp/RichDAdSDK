@@ -1,0 +1,75 @@
+//
+//  RichD_SplashAd.h
+//  RichDAdSDK
+//
+//  Created by 刘士林 on 2024/3/19.
+//
+
+#import <Foundation/Foundation.h>
+@class RichDShakeInfo;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol RichDSplashAdDelegate;
+@interface RichD_SplashAd : NSObject
+//广告位id
+@property (nonatomic, copy, readonly, nonnull) NSString *slotID;
+//当前广告的报价
+@property(nonatomic, assign, readonly) long bidPrice;
+//竞价成功地址
+@property (nonatomic , copy ,readonly)NSArray  * winNoticeUrl ;
+//竞价失败地址
+@property (nonatomic , copy, readonly) NSArray * lnurl ;
+//开屏的view,如果有特殊需要可以直接展示
+@property (nonatomic, strong, readonly) UIView *dmSplashView;
+//使用controller present 落地页
+@property (nonatomic, weak) UIViewController *presentAdViewController;
+
+@property (nonatomic , copy) NSString * materialId ;
+@property (nonatomic , copy) NSString * rid ;
+/// 外部注入的链路请求 ID（ap）；若设置则优先使用，否则自动生成
+@property (nonatomic, copy, nullable) NSString *requestId;
+/// 外部注入的 ADN 请求 ID（aq）；若设置则优先使用，否则自动生成
+@property (nonatomic, copy, nullable) NSString *adnrequestId;
+//广告的关闭类型
+@property (nonatomic, assign) RichDAdCloseType adCloseType;
+/// 初始化开屏广告和配置代理
+/// - Parameter delegate: 代理
+/// - Parameter slotID: 广告位id
+/// - Parameter adSize: 尺寸,必须>=屏幕高度的75%，如果高度<75%，将会以屏幕实际高度渲染，可能会导致图片变形或影响广告渲染速度
+- (instancetype)loadSplashAdTemplateAdWithSlotID:(NSString *)slotID adSize:(CGSize)adSize delegate:(id<RichDSplashAdDelegate>)delegate ;
+//竞价成功的上报
+- (void)biddingSplashSuccess:(long)price;
+//竞价失败的上报
+- (void)biddingSplashFailed:(long)price Code:(RichDAdBiddingCode)code;
+/// 展示广告
+/// - Parameter viewController: 当前要展示的控制器
+-(void)showSplashViewInRootViewController:(UIViewController *)viewController;
+/// 广告加载成功后调用，根据 shakeCallback 配置返回摇一摇信息；0-关闭时返回 nil
+- (nullable RichDShakeInfo *)getShakeInfo;
+/// 预加载缓存命中复用时调用：按埋点规范补发 2005(广告请求)并生成新 aq，2001(宿主调用)不发
+- (void)trackCacheHitAdnRequest;
+
+@end
+
+@protocol RichDSplashAdDelegate <NSObject>
+/// 加载成功
+- (void)splashAdDidLoad :(RichD_SplashAd*)splashAd;
+/// 加载失败
+- (void)splashAdDidFailToLoadWithError:(NSError *)error;
+/// 渲染成功
+- (void)splashAdDidRender:(RichD_SplashAd*)splashAd;;
+/// 渲染失败
+- (void)splashAdDidFailToRenderWithError:(NSError *)error;
+/// 广告已经打开
+- (void)splashAdDidShow:(RichD_SplashAd *)splashAd;
+/// 广告被点击
+- (void)splashAdDidClick:(RichD_SplashAd *)splashAd;
+/// 广告被关闭
+- (void)splashAdDidClose:(RichD_SplashAd *)splashAd;
+/// 广告详情页关闭回调
+- (void)splashAdDetailViewDidClose:(RichD_SplashAd *)splashAd;
+/// 广告详情页将展示回调
+- (void)splashAdDetailViewDidPresentScreen:(RichD_SplashAd *)splashAd;
+@end
+NS_ASSUME_NONNULL_END
