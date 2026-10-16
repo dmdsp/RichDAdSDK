@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'RichDAdSDK'
-  s.version          = '3.9.2.11'
+  s.version          = '3.9.2.12'
   s.summary          = 'RichD 广告 SDK'
 
   s.description      = <<-DESC
